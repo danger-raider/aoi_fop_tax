@@ -78,7 +78,9 @@
         const incomeInput = document.getElementById("income");
         const periodSelect = document.getElementById("period");
         const resultDiv = document.getElementById("result");
-
+        window.onload = () => {
+          document.getElementById("aoi-greeting").style.opacity = 1;
+        };
         function calculate() {
             const income = parseFloat(incomeInput.value);
             const months = parseInt(periodSelect.value);
@@ -97,10 +99,6 @@
                 <hr>
                 Усього податків: <b>${total.toFixed(2)} грн</b>
             `;
-            window.onload = () => {
-              document.getElementById("aoi-greeting").style.opacity = 1;
-            };
-
         }
 
         incomeInput.addEventListener("input", calculate);
