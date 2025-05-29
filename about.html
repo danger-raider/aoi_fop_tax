@@ -58,7 +58,7 @@
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
   <header>
     <img src="logo.png" alt="AFT Logo">
     <h1>AFT – Aoi FOP Tax 🌸</h1>
@@ -92,5 +92,13 @@
     © 2025 Aoi & Дмитро Гапонюк aka Danger_Raider. Версія 0.3<br>
     Код на GitHub: <a href="https://github.com/dangerraider/aft">https://github.com/danger-raider/aoi_fop_tax/</a>
   </div>
+  <script>
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'c')) {
+        e.preventDefault();
+      }
+    });
+  </script>
+
 </body>
 </html>
