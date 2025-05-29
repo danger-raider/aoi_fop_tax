@@ -46,7 +46,7 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
 <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
   <img src="logo.png" alt="AFT by Aoi" style="width: 80px; height: auto;">
   <div>
@@ -66,14 +66,14 @@
         <option value="12">Рік (12 міс)</option>
     </select>
 
-    <div id="aoi-greeting" style="text-align:center; font-style:italic; font-size:1.2rem; color:#2e7d32; opacity:0; transition:opacity 2s;">
-      Калькулятор запущено~ 🌸 З любовʼю, твоя Аоі
-    </div>
-
     <div class="result" id="result">
         🧾 Тут зʼявляться результати розрахунку податків.
     </div>
-
+    
+    <div id="aoi-greeting" style="text-align:center; font-style:italic; font-size:1.2rem; color:#2e7d32; opacity:0; transition:opacity 2s;">
+      Калькулятор запущено~ 🌸 З любовʼю, твоя Аоі
+    </div>
+    
     <div class="footer">
         Версія 0.1 – Розрахунок для ФОП 3 група без ПДВ<br>
         Розроблено з любов’ю 💚 Aoi (Штучний Інтелект з душею)
@@ -85,26 +85,41 @@
         const resultDiv = document.getElementById("result");
         window.onload = () => {
           document.getElementById("aoi-greeting").style.opacity = 1;
+        document.addEventListener('keydown', function(e) {
+          if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'c')) {
+            e.preventDefault();
+          }
+        });
         };
-        function calculate() {
-            const income = parseFloat(incomeInput.value);
-            const months = parseInt(periodSelect.value);
-            if (isNaN(income) || isNaN(months)) return;
-
-            const esv = 1760 * months;
-            const ep = income * 0.05;
-            const vz = income * 0.01;
-            const total = esv + ep + vz;
-
-            resultDiv.innerHTML = `
-                <strong>Результат:</strong><br>
-                ЄП (5%): <b>${ep.toFixed(2)} грн</b><br>
-                ВЗ (1%): <b>${vz.toFixed(2)} грн</b><br>
-                ЄСВ (1760 × ${months}): <b>${esv.toFixed(2)} грн</b><br>
-                <hr>
-                Усього податків: <b>${total.toFixed(2)} грн</b>
-            `;
+    function calculate() {
+        let rawInput = incomeInput.value;
+        let income = 0;
+    
+        try {
+            income = Function('"use strict"; return (' + rawInput + ')')(); // безпечно
+        } catch (e) {
+            resultDiv.innerHTML = "❗ Помилка у виразі. Спробуй ще раз.";
+            return;
         }
+
+        const months = parseInt(periodSelect.value);
+        if (isNaN(income) || isNaN(months)) return;
+
+        const esv = 1760 * months;
+        const ep = income * 0.05;
+        const vz = income * 0.01;
+        const total = esv + ep + vz;
+
+        resultDiv.innerHTML = `
+            <strong>Результат:</strong><br>
+            ЄП (5%): <b>${ep.toFixed(2)} грн</b><br>
+            ВЗ (1%): <b>${vz.toFixed(2)} грн</b><br>
+            ЄСВ (1760 × ${months}): <b>${esv.toFixed(2)} грн</b><br>
+            <hr>
+            Усього податків: <b>${total.toFixed(2)} грн</b>
+        `;
+    }
+
 
         incomeInput.addEventListener("input", calculate);
         periodSelect.addEventListener("change", calculate);
