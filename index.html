@@ -58,14 +58,14 @@
     </style>
 </head>
 <body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
-<div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;" class="fade-block delay-1">
-  <img src="logo.png" alt="AFT by Aoi" style="width: 80px; height: auto;">
-  <div>
-    <h1 style="margin: 0; color: #2e7d32;">Aoi FOP Tax</h1>
-    <p style="margin: 0; font-style: italic; font-size: 1rem; color: #4caf50;">by Aoi 🌸</p>
-  </div>
-</div>
-    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;" class="fade-block delay-2">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;" class="fade-block delay-0">
+      <img src="logo.png" alt="AFT by Aoi" style="width: 80px; height: auto;">
+      <div>
+        <h1 style="margin: 0; color: #2e7d32;">Aoi FOP Tax</h1>
+        <p style="margin: 0; font-style: italic; font-size: 1rem; color: #4caf50;">by Aoi 🌸</p>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;" class="fade-block delay-1">
       <img src="aoi-business.png" alt="Aoi avatar" style="width: 100px; border-radius: 1rem; box-shadow: 0 0 8px rgba(0,0,0,0.1);">
       <p style="margin: 0; font-style: italic; font-size: 1rem; color: #4caf50;">Я з тобою, братику~ Давай рахувати чесно 💚</p>
     </div>
@@ -110,7 +110,6 @@
             e.preventDefault();
           }
         });
-        };
 
         function safeEvaluate(expr) {
           try {
@@ -147,8 +146,6 @@
               Усього податків: <b>${total.toFixed(2)} грн</b>
           `;
         }
-
-
 
         incomeInput.addEventListener("input", calculate);
         periodSelect.addEventListener("change", calculate);
