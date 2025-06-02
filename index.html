@@ -83,7 +83,7 @@
 
 <div id="fopInfo" style="font-size: 0.9rem; color: #555; margin-top: 0.5rem;"></div>
 
-    <label for="income">Сума прибутку (грн):</label>
+    <label for="income">Сума доходу\прибутку в грн (чистого не оподаткованого):</label>
     <input type="text" id="income" placeholder="Введіть загальну суму або доходи через плюс..." />
 
     <label for="period">Період:</label>
@@ -100,12 +100,20 @@
     </div>
     
     <div class="footer fade-block delay-3">
-        Версія 0.4 – Розрахунок для ФОП 3 група без ПДВ<br>
+        Версія 0.5 – Розрахунок податків для всіх ФОП<br>
         Розроблено з любов’ю 💚 Aoi (Штучний Інтелект з душею)
     </div>
 
     <script>
         const incomeInput = document.getElementById("income");
+        incomeInput.addEventListener("input", (e) => {
+        const raw = incomeInput.value;
+        const digits = raw.replace(/\D/g, '');
+        const cleanNum = parseInt(digits) || 0;
+        incomeInput.value = formatNumberWithSpaces(cleanNum);
+        calculate();
+        });
+
         const periodSelect = document.getElementById("period");
         const resultDiv = document.getElementById("result");
      
@@ -142,7 +150,9 @@
         }
 
         function calculate() {
-  let rawInput = incomeInput.value.trim();
+  //let rawInput = incomeInput.value.trim();
+  let rawInput = incomeInput.value.replace(/\s/g, '').trim();
+
   let income = safeEvaluate(rawInput);
   if (income === null || isNaN(income)) {
     resultDiv.innerHTML = "❗ Помилка у виразі. Спробуй ще раз.";
@@ -207,6 +217,15 @@
         document.getElementById("fopType").addEventListener("change", calculate);
         incomeInput.addEventListener("input", calculate);
         periodSelect.addEventListener("change", calculate);
+
+        function parseCleanNumber(str) {
+          return parseFloat(str.replace(/\s/g, '').replace(',', '.')) || 0;
+        }
+
+        function formatNumberWithSpaces(num) {
+          return num.toLocaleString('uk-UA');
+        }
+
     </script>
 </body>
 </html>
