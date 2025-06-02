@@ -98,14 +98,41 @@
     <div class="result fade-block delay-2" id="result">
         🧾 Тут зʼявляться результати розрахунку податків.
     </div>
-    
+        <div style="text-align:center; margin-top: 1rem;">
+            <a href="https://cabinet.tax.gov.ua/login" target="_blank" style="
+            background-color: #4caf50;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            transition: background-color 0.3s ease;
+            "
+            onmouseover="this.style.backgroundColor='#388e3c'"
+            onmouseout="this.style.backgroundColor='#4caf50'">
+            Кабінет платника податків 🔐
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 1rem;">
+        <button onclick="toggleCalendar()" style="padding: 0.6rem 1.2rem; background-color: #2e7d32; color: white; border: none; border-radius: 0.5rem; font-weight: bold; cursor: pointer;">
+        📅 Показати календар податкових подій
+        </button>
+        </div>
+        <div id="calendarBlock" class="fade-block" style="display: none; margin-top: 1.5rem; background: #f9fbe7; padding: 1rem; border-radius: 0.5rem; font-size: 0.9rem;">
+        <strong>Податковий календар:</strong>
+        <div id="calendarContent" style="margin-top: 0.5rem;"></div>
+        </div>
+
     <div class="footer fade-block delay-3">
-        Версія 0.5 – Розрахунок податків для всіх ФОП<br>
+        Версія 0.8 – Розрахунок податків для всіх ФОП<br>
         Розроблено з любов’ю 💚 Aoi (Штучний Інтелект з душею)
     </div>
 
     <script>
         const incomeInput = document.getElementById("income");
+
         incomeInput.addEventListener("input", (e) => {
         const raw = incomeInput.value;
         const digits = raw.replace(/\D/g, '');
@@ -132,6 +159,8 @@
           }
         });
 
+        document.getElementById("fopType").addEventListener("change", updateCalendar);
+
         function safeEvaluate(expr) {
           try {
             // Видаляємо все, що не цифра, +, - або пробіл
@@ -150,82 +179,171 @@
         }
 
         function calculate() {
-  //let rawInput = incomeInput.value.trim();
-  let rawInput = incomeInput.value.replace(/\s/g, '').trim();
+          //let rawInput = incomeInput.value.trim();
+          let rawInput = incomeInput.value.replace(/\s/g, '').trim();
 
-  let income = safeEvaluate(rawInput);
-  if (income === null || isNaN(income)) {
-    resultDiv.innerHTML = "❗ Помилка у виразі. Спробуй ще раз.";
-    return;
-  }
+          let income = safeEvaluate(rawInput);
+          if (income === null || isNaN(income)) {
+            resultDiv.innerHTML = "🌀 Обчислення...";
+            return;
+          }
 
-  const months = parseInt(periodSelect.value);
-  const fop = document.getElementById("fopType").value;
-  const infoDiv = document.getElementById("fopInfo");
+          const months = parseInt(periodSelect.value);
+          const fop = document.getElementById("fopType").value;
+          const infoDiv = document.getElementById("fopInfo");
 
-  let ep = 0, vz = 0, esv = 1760 * months, pdv = 0;
-  let limit = 0, epLabel = '', pdvLabel = '', reportMsg = '';
+          let ep = 0, vz = 0, esv = 1760 * months, pdv = 0;
+          let limit = 0, epLabel = '', pdvLabel = '', reportMsg = '';
 
-  if (fop === "3_без_ПДВ") {
-    ep = income * 0.05;
-    vz = income * 0.01;
-    limit = 8940000;
-    epLabel = "ЄП (5%)";
-    reportMsg = "Звіт ЄСВ і ЄП до 20 числа наступного місяця.";
-  } else if (fop === "3_з_ПДВ") {
-    ep = income * 0.03;
-    vz = income * 0.01;
-    pdv = income * 0.2;
-    limit = 8940000;
-    epLabel = "ЄП (3%)";
-    pdvLabel = "ПДВ (20%)";
-    reportMsg = "Щомісячний звіт ПДВ та ЄП.";
-  } else if (fop === "2") {
-    ep = 1430 * months;
-    vz = income * 0.01;
-    limit = 2964000;
-    epLabel = `ЄП (фіксовано ${formatUAH(1430)} на міс)`;
-    reportMsg = "Щоквартальний звіт ЄП.";
-  } else if (fop === "1") {
-    ep = 346 * months;
-    vz = income * 0.01;
-    limit = 1670000;
-    epLabel = `ЄП (фіксовано ${formatUAH(346)} на міс)`;
-    reportMsg = "Щорічний звіт ЄП.";
-  }
+          if (fop === "3_без_ПДВ") {
+            ep = income * 0.05;
+            vz = income * 0.01;
+            limit = 8940000;
+            epLabel = "ЄП (5%)";
+            reportMsg = "Звіт ЄСВ і ЄП до 20 числа наступного місяця.";
+          } else if (fop === "3_з_ПДВ") {
+            ep = income * 0.03;
+            vz = income * 0.01;
+            pdv = income * 0.2;
+            limit = 8940000;
+            epLabel = "ЄП (3%)";
+            pdvLabel = "ПДВ (20%)";
+            reportMsg = "Щомісячний звіт ПДВ та ЄП.";
+          } else if (fop === "2") {
+            ep = 1430 * months;
+            vz = income * 0.01;
+            limit = 2964000;
+            epLabel = `ЄП (фіксовано ${formatUAH(1430)} на міс)`;
+            reportMsg = "Щоквартальний звіт ЄП.";
+          } else if (fop === "1") {
+            ep = 346 * months;
+            vz = income * 0.01;
+            limit = 1670000;
+            epLabel = `ЄП (фіксовано ${formatUAH(346)} на міс)`;
+            reportMsg = "Щорічний звіт ЄП.";
+          }
 
-  const total = esv + ep + vz + pdv;
-  const left = limit - income;
-  const percentUsed = (income / limit * 100).toFixed(1);
+          const total = esv + ep + vz + pdv;
+          const left = limit - income;
+          const percentUsed = (income / limit * 100).toFixed(1);
 
-  infoDiv.innerHTML = `
-    Річний ліміт: <b>${formatUAH(limit)}</b><br>
-    Залишилось: <b>${formatUAH(left)}</b> (${percentUsed}% використано)<br>
-    🔔 <i>${reportMsg}</i>
-  `;
+      // infoDiv.innerHTML = `
+      //   Річний ліміт: <b>${formatUAH(limit)}</b><br>
+      //   Залишилось: <b>${formatUAH(left)}</b> (${percentUsed}% використано)<br>
+      //   🔔 <i>${reportMsg}</i>
+      // `;
+        infoDiv.innerHTML = `
+        <div style="margin-bottom: 0.5rem;">
+          Річний ліміт: <b>${formatUAH(limit)}</b><br>
+          Залишилось: <b>${formatUAH(left)}</b> (${percentUsed}% використано)
+        </div>
+        <div style="background:#c8e6c9; border-radius:1rem; overflow:hidden; height:20px; box-shadow:inset 0 0 4px rgba(0,0,0,0.1);">
+          <div style="
+            width:${Math.min(percentUsed, 100)}%;
+            height:100%;
+            background:${percentUsed < 50 ? '#66bb6a' : percentUsed < 95 ? '#ffa726' : '#e53935'};
+            transition: width 0.5s ease;
+          "></div>
+        </div>
+        <div style="font-size: 0.9rem; margin-top: 0.25rem; color: #777;">🔔 <i>${reportMsg}</i></div>
+        `;
 
-  resultDiv.innerHTML = `
-      <strong>Результат:</strong><br>
-      ${epLabel}: <b>${formatUAH(ep)}</b><br>
-      ВЗ (1%): <b>${formatUAH(vz)}</b><br>
-      ЄСВ (1760 × ${months}): <b>${formatUAH(esv)}</b><br>
-      ${fop === "3_з_ПДВ" ? `${pdvLabel}: <b>${formatUAH(pdv)}</b><br>` : ""}
-      <hr>
-      Усього податків: <b>${formatUAH(total)}</b>
-  `;
-}
+        resultDiv.innerHTML = `
+          <strong>Результат:</strong><br>
+          ${epLabel}: <b>${formatUAH(ep)}</b><br>
+          ВЗ (1%): <b>${formatUAH(vz)}</b><br>
+          ЄСВ (1760 × ${months}): <b>${formatUAH(esv)}</b><br>
+          ${fop === "3_з_ПДВ" ? `${pdvLabel}: <b>${formatUAH(pdv)}</b><br>` : ""}
+          <hr>
+          Усього податків: <b>${formatUAH(total)}</b><br>
+          `;
+        } 
+
         document.getElementById("fopType").addEventListener("change", calculate);
-        incomeInput.addEventListener("input", calculate);
+        //incomeInput.addEventListener("input", calculate);
         periodSelect.addEventListener("change", calculate);
+
+        incomeInput.addEventListener("input", (e) => {
+          const cursorStart = incomeInput.selectionStart;
+          const raw = incomeInput.value.replace(/\s/g, '');
+          const formatted = formatInputWithSpaces(raw);
+          incomeInput.value = formatted;
+
+          // Визначаємо нову позицію курсора
+          const diff = formatted.length - raw.length;
+          incomeInput.setSelectionRange(cursorStart + diff, cursorStart + diff);
+
+          calculate(); // Перерахунок
+        });
 
         function parseCleanNumber(str) {
           return parseFloat(str.replace(/\s/g, '').replace(',', '.')) || 0;
         }
 
-        function formatNumberWithSpaces(num) {
-          return num.toLocaleString('uk-UA');
+        // function formatNumberWithSpaces(num) {
+        //   return num.toLocaleString('uk-UA');
+        // }
+        function formatInputWithSpaces(raw) {
+          return raw.replace(/\d+/g, match => {
+            return Number(match).toLocaleString('uk-UA');
+          });
+        }
+
+        //calendar
+        function toggleCalendar() {
+          const block = document.getElementById("calendarBlock");
+          block.style.display = (block.style.display === "none") ? "block" : "none";
+          if (block.style.display === "block") {
+            block.classList.add('fade-in');
+            updateCalendar();
+          }
+        }
+
+        function updateCalendar() {
+          const fop = document.getElementById("fopType").value;
+          const cal = document.getElementById("calendarContent");
+
+          let rows = [];
+
+          if (fop === "3_без_ПДВ") {
+            rows = [
+              ["до 20 числа щомісяця", "Сплата ЄСВ"],
+              ["до 20 числа щомісяця", "Сплата ЄП (5%)"],
+              ["до 20 числа наступного місяця після закінчення кварталу", "Подання звіту ЄП + ЄСВ"]
+            ];
+          } else if (fop === "3_з_ПДВ") {
+            rows = [
+              ["до 20 числа щомісяця", "Сплата ЄСВ"],
+              ["до 20 числа щомісяця", "Сплата ЄП (3%)"],
+              ["до 20 числа щомісяця", "Сплата ПДВ"],
+              ["до 20 числа щомісяця", "Подання звіту ПДВ"],
+              ["до 20 числа наступного місяця  після закінчення кварталу", "Подання звіту ЄП + ЄСВ"]
+            ];
+          } else if (fop === "2") {
+            rows = [
+              ["до 20 числа щомісяця", "Сплата ЄСВ"],
+              ["до 20 числа останнього місяця кварталу", "Сплата ЄП (фікс.)"],
+              ["до 40-го дня після закінчення кварталу", "Подання звіту ЄП"]
+            ];
+          } else if (fop === "1") {
+            rows = [
+              ["до 20 числа щомісяця", "Сплата ЄСВ"],
+              ["до 20 січня наступного року", "Сплата ЄП (фікс.)"],
+              ["до 1 березня наступного року", "Подання звіту ЄП"]
+            ];
+          }
+
+          let html = `<table style="width: 100%; border-collapse: collapse;">`;
+          html += `<tr><th style="text-align:left; border-bottom: 1px solid #ccc;">Дата</th><th style="text-align:left; border-bottom: 1px solid #ccc;">Подія</th></tr>`;
+          rows.forEach(([date, event]) => {
+            html += `<tr><td style="padding: 0.4rem 0;">${date}</td><td>${event}</td></tr>`;
+          });
+          html += `</table>`;
+
+          cal.innerHTML = html;
         }
 
     </script>
 </body>
+
 </html>
