@@ -125,6 +125,12 @@
             return null;
           }
         }
+        function formatUAH(amount) {
+          return amount.toLocaleString('uk-UA', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }) + ' грн';
+        }
 
         function calculate() {
           let rawInput = incomeInput.value.trim();
@@ -143,12 +149,13 @@
 
           resultDiv.innerHTML = `
               <strong>Результат:</strong><br>
-              ЄП (5%): <b>${ep.toFixed(2)} грн</b><br>
-              ВЗ (1%): <b>${vz.toFixed(2)} грн</b><br>
-              ЄСВ (1760 × ${months}): <b>${esv.toFixed(2)} грн</b><br>
+              ЄП (5%): <b>${formatUAH(ep)}</b><br>
+              ВЗ (1%): <b>${formatUAH(vz)}</b><br>
+              ЄСВ (1760 × ${months}): <b>${formatUAH(esv)}</b><br>
               <hr>
-              Усього податків: <b>${total.toFixed(2)} грн</b>
-          `;
+              Усього податків: <b>${formatUAH(total)}</b>
+           `;
+
         }
 
         incomeInput.addEventListener("input", calculate);
